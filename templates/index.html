@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OffGrid Messenger</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="container">
+    <!-- HEADER -->
+    <div class="header">
+        <div>
+            <h1>OffGrid Messenger</h1>
+            <p>Local Messaging & File Sharing</p>
+        </div>
+        <span class="status">● OFFLINE READY</span>
+    </div>
+    <!-- USERNAME -->
+    <div class="username-area">
+        <label>Your Name</label>
+        <input type="text" id="username" placeholder="Enter your name" maxlength="30">
+    </div>
+    <!-- MESSAGES -->
+    <div id="messages" class="messages">
+        <div class="loading">Loading messages...</div>
+    </div>
+    <!-- FILE SELECTED -->
+    <div id="selectedFile" class="selected-file"></div>
+    <!-- MESSAGE AREA -->
+    <div class="input-area">
+        <label for="fileInput" class="attach-button" title="Share file">📎</label>
+        <input type="file" id="fileInput" hidden>
+        <input type="text" id="message" placeholder="Type a message..." maxlength="2000">
+        <button id="sendButton" onclick="sendMessage()">Send</button>
+    </div>
+    <!-- FILE UPLOAD BUTTON -->
+    <div id="uploadArea" class="upload-area">
+        <button onclick="uploadFile()" class="upload-button">Upload Selected File</button>
+        <button onclick="cancelFile()" class="cancel-button">Cancel</button>
+    </div>
+    <!-- FOOTER -->
+    <div class="footer">
+        <span>🔒 Local Network</span>
+        <span>📡 No Internet Required</span>
+        <span>📁 File Sharing</span>
+    </div>
+</div>
+<script>
+let lastMessageCount = 0;
+// FORMAT FILE SIZE
+function formatFileSize(bytes) {
+    if (!bytes) {
+        return "";
+    }
+    if (bytes < 1024) {
+        return bytes + " B";
+    }
+    if (bytes < 1024 * 1024) {
+        return (bytes / 1024).toFixed(1) + " KB";
+    }
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+}
+// LOAD MESSAGES
+async function loadMessages() {
+    try {
+        const response = await fetch("/messages");
+        const data = await response.json();
+        const box = document.getElementById("messages");
+        const currentUser = document.getElementById("username").value.trim();
+        box.innerHTML = "";
+        if (data.length === 0) {
+            box.innerHTML = `
+                <div class="empty-chat">
+                    <div class="empty-icon">💬</div>
+                    <h3>No messages yet</h3>
+                    <p>Start an offline conversation.</p>
+                </div>
+            `;
+            return;
+        }
+        data.forEach(item => {
+            const wrapper = document.createElement("div");
+            if (currentUser && item.username === currentUser) {
+                wrapper.className = "message-row mine";
+            } else {
+                wrapper.className = "message-row";
+            }
+            const message = document.createElement("div");
+            message.className = "message";
+            const username = document.createElement("div");
+            username.className = "message-user";
+            username.textContent = item.username;
+            message.appendChild(username);
+            if (item.type === "text") {
+                const text = document.createElement("div");
+                text.className = "message-text";
+                text.textContent = item.message;
+                message.appendChild(text);
+            } else if (item.type === "file") {
+                const fileCard = document.createElement("div");
+                fileCard.className = "file-card";
+                const icon = document.createElement("div");
+                icon.className = "file-icon";
+                icon.textContent = "📄";
+                const information = document.createElement("div");
+                information.className = "file-info";
+                const filename = document.createElement("div");
+                filename.className = "file-name";
+                filename.textContent = item.filename;
+                const filesize = document.createElement("div");
+                filesize.className = "file-size";
+                filesize.textContent = formatFileSize(item.file_size);
+                information.appendChild(filename);
+                information.appendChild(filesize);
+                const download = document.createElement("a");
+                download.className = "download-button";
+                download.href = "/download/" + item.id;
+                download.textContent = "Download";
+                fileCard.appendChild(icon);
+                fileCard.appendChild(information);
+                fileCard.appendChild(download);
+                message.appendChild(fileCard);
+            }
+            const time = document.createElement("div");
+            time.className = "message-time";
+            time.textContent = item.time;
+            message.appendChild(time);
+            wrapper.appendChild(message);
+            box.appendChild(wrapper);
+        });
+        if (data.length !== lastMessageCount) {
+            box.scrollTop = box.scrollHeight;
+            lastMessageCount = data.length;
+        }
+    } catch (error) {
+        console.log("Unable to connect to server");
+    }
+}
+// SEND MESSAGE
+async function sendMessage() {
+    const username = document.getElementById("username").value.trim();
+    const messageInput = document.getElementById("message");
+    const message = messageInput.value.trim();
+    if (!username) {
+        alert("Please enter your name.");
+        return;
+    }
+    if (!message) {
+        return;
+    }
+    try {
+        const response = await fetch("/send", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                username: username,
+                message: message
+            })
+        });
+        const result = await response.json();
+        if (response.ok) {
+            messageInput.value = "";
+            await loadMessages();
+        } else {
+            alert(result.error || "Could not send message.");
+        }
+    } catch (error) {
+        alert("Unable to connect to the server.");
+    }
+}
+// FILE SELECTED
+document.getElementById("fileInput").addEventListener("change", function() {
+    const file = this.files[0];
+    if (!file) {
+        return;
+    }
+    document.getElementById("selectedFile").innerHTML = "📎 <strong>" + escapeHTML(file.name) + "</strong> (" + formatFileSize(file.size) + ")";
+    document.getElementById("uploadArea").style.display = "flex";
+});
+// UPLOAD FILE
+async function uploadFile() {
+    const username = document.getElementById("username").value.trim();
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0];
+    if (!username) {
+        alert("Please enter your name.");
+        return;
+    }
+    if (!file) {
+        alert("Please select a file.");
+        return;
+    }
+    if (file.size > 100 * 1024 * 1024) {
+        alert("Maximum file size is 100 MB.");
+        return;
+    }
+    const formData = new FormData();
+    formData.append("username", username);
+    formData.append("file", file);
+    const uploadButton = document.querySelector(".upload-button");
+    uploadButton.disabled = true;
+    uploadButton.textContent = "Uploading...";
+    try {
+        const response = await fetch("/upload", {
+            method: "POST",
+            body: formData
+        });
+        const result = await response.json();
+        if (response.ok) {
+            cancelFile();
+            await loadMessages();
+        } else {
+            alert(result.error || "Upload failed.");
+        }
+    } catch (error) {
+        alert("Unable to upload file.");
+    } finally {
+        uploadButton.disabled = false;
+        uploadButton.textContent = "Upload Selected File";
+    }
+}
+// CANCEL FILE
+function cancelFile() {
+    document.getElementById("fileInput").value = "";
+    document.getElementById("selectedFile").innerHTML = "";
+    document.getElementById("uploadArea").style.display = "none";
+}
+// BASIC HTML ESCAPING
+function escapeHTML(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+}
+// ENTER TO SEND
+document.getElementById("message").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        sendMessage();
+    }
+});
+// REFRESH EVERY SECOND
+setInterval(loadMessages, 1000);
+loadMessages();
+</script>
+</body>
+</html>

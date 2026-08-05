@@ -1,0 +1,325 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #eef2f7;
+    color: #1f2937;
+}
+
+.container {
+    width: 95%;
+    max-width: 760px;
+    margin: 25px auto;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+}
+
+/* HEADER */
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: #111827;
+    color: white;
+}
+
+.header h1 {
+    margin: 0 0 5px;
+    font-size: 24px;
+}
+
+.header p {
+    margin: 0;
+    color: #cbd5e1;
+    font-size: 14px;
+}
+
+.status {
+    color: #4ade80;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+/* USER */
+
+.username-area {
+    padding: 14px 18px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.username-area label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.username-area input {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    outline: none;
+}
+
+/* CHAT */
+
+.messages {
+    height: 440px;
+    overflow-y: auto;
+    padding: 18px;
+    background: #f8fafc;
+}
+
+.message-row {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 12px;
+}
+
+.message-row.mine {
+    justify-content: flex-end;
+}
+
+.message {
+    max-width: 78%;
+    padding: 11px 13px;
+    border-radius: 12px;
+    background: #e5e7eb;
+    overflow-wrap: anywhere;
+}
+
+.message-row.mine .message {
+    background: #dbeafe;
+}
+
+.message-user {
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.message-text {
+    line-height: 1.4;
+}
+
+.message-time {
+    margin-top: 7px;
+    text-align: right;
+    font-size: 10px;
+    color: #64748b;
+}
+
+/* EMPTY CHAT */
+
+.empty-chat {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #64748b;
+}
+
+.empty-chat h3 {
+    margin: 8px 0 4px;
+}
+
+.empty-chat p {
+    margin: 0;
+}
+
+.empty-icon {
+    font-size: 40px;
+}
+
+/* FILE CARD */
+
+.file-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 5px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+}
+
+.file-icon {
+    font-size: 28px;
+}
+
+.file-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.file-name {
+    font-weight: bold;
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-size {
+    margin-top: 3px;
+    font-size: 11px;
+    color: #64748b;
+}
+
+.download-button {
+    text-decoration: none;
+    background: #2563eb;
+    color: white;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+/* SELECTED FILE */
+
+.selected-file {
+    padding: 0 18px;
+    font-size: 13px;
+    background: white;
+}
+
+/* MESSAGE INPUT */
+
+.input-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.input-area input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    outline: none;
+}
+
+.input-area button {
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+}
+
+.attach-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    background: #e5e7eb;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+/* UPLOAD */
+
+.upload-area {
+    display: none;
+    gap: 8px;
+    padding: 0 14px 14px;
+}
+
+.upload-button {
+    border: none;
+    background: #16a34a;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.cancel-button {
+    border: none;
+    background: #e5e7eb;
+    padding: 10px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+/* FOOTER */
+
+.footer {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 10px;
+    border-top: 1px solid #e5e7eb;
+    font-size: 11px;
+    color: #64748b;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+    body {
+        background: white;
+    }
+
+    .container {
+        width: 100%;
+        margin: 0;
+        min-height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .header {
+        padding: 15px;
+    }
+
+    .header h1 {
+        font-size: 20px;
+    }
+
+    .header p {
+        font-size: 12px;
+    }
+
+    .status {
+        font-size: 10px;
+    }
+
+    .messages {
+        height: 58vh;
+    }
+
+    .message {
+        max-width: 88%;
+    }
+
+    .file-card {
+        flex-wrap: wrap;
+    }
+
+    .download-button {
+        margin-left: auto;
+    }
+
+    .footer {
+        font-size: 10px;
+    }
+}
